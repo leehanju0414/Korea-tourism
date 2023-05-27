@@ -9,6 +9,13 @@ from kor_api import *
 def mainGUI():
 
     selected_tourism_info = None
+    bookmarks = []
+
+    def bookmark_append():
+        pass
+
+    def bookmark_delete():
+        pass
 
     def show_tourism_info(event):
         global selected_tourism_info
@@ -35,7 +42,8 @@ def mainGUI():
 
         info_canvas.create_text(175, 300, text="["+tour_infoes[index[0]]['title']+"]", font=("Georgia", 14, "bold"), width=350)
         info_canvas.create_text(175, 340, text=tour_infoes[index[0]]['address'], font=("Georgia", 13, "bold"), width=350)
-        info_canvas.create_text(0, 380, text=" "+overview_text, font=("Georgia", 12), width=350, anchor="nw")
+        info_canvas.create_text(175, 360, text=detail_infoes[0]['tel'], font=("Georgia", 13, "bold"), width=350)
+        info_canvas.create_text(0, 400, text=" "+overview_text, font=("Georgia", 12), width=350, anchor="nw")
 
         info_canvas.configure(scrollregion=info_canvas.bbox("all"))
 
@@ -131,32 +139,57 @@ def mainGUI():
 
     sido_combo.bind("<<ComboboxSelected>>", update_sigungu_combo)
 
-    # 목록 라벨
-    label3 = tk.Label(frame1, text="목록")
-    label3.grid(column=0, row=4, sticky="w")
+    # Notebook1 생성
+    notebook1 = ttk.Notebook(frame1)
+    notebook1.grid(column=0, row=4, columnspan=2)
 
-    # 목록 리스트 박스
-    tourism_list = tk.Listbox(frame1, width=50, height=20)
-    tourism_list.grid(column=0, row=5, columnspan=2)
+    # 검색결과 리스트 박스 (tab1)
+    n1_tab1 = ttk.Frame(notebook1)
+    tourism_list = tk.Listbox(n1_tab1, width=50, height=20)
+    tourism_list.grid(column=0, row=0)
+    notebook1.add(n1_tab1, text='검색결과')
 
-    # 목록 스크롤바
-    scrollbar1 = tk.Scrollbar(frame1, orient="vertical")
-    scrollbar1.grid(column=2, row=5, sticky="NS")
+    # 즐겨찾기 리스트 박스 (tab2)
+    n1_tab2 = ttk.Frame(notebook1)
+    bookmark_list = tk.Listbox(n1_tab2, width=50, height=20)
+    bookmark_list.grid(column=0, row=0)
+    notebook1.add(n1_tab2, text='즐겨찾기')
 
-    # 스크롤바와 목록 연결
+    # 검색결과 스크롤바
+    scrollbar1 = tk.Scrollbar(n1_tab1, orient="vertical")
+    scrollbar1.grid(column=1, row=0, sticky="NS")
+    # 즐겨찾기 스크롤바
+    scrollbar2 = tk.Scrollbar(n1_tab2, orient="vertical")
+    scrollbar2.grid(column=1, row=0, sticky="NS")
+
+    # 스크롤바와 검색결과 연결
     tourism_list.config(yscrollcommand=scrollbar1.set)
     scrollbar1.config(command=tourism_list.yview)
+    # 스크롤바와 즐겨찾기 연결
+    bookmark_list.config(yscrollcommand=scrollbar2.set)
+    scrollbar2.config(command=bookmark_list.yview)
 
-    # 정보창 라벨
-    label4 = tk.Label(frame2, text="정보")
-    label4.grid(column=0, row=0, sticky="w")
+    # 즐겨찾기 추가, 삭제 버튼 생성
+    bookmark_add_button = tk.Button(frame1, text="즐겨찾기 추가", command=bookmark_append)
+    bookmark_add_button.grid(column=0, row=5, sticky="e")
+    bookmark_del_button = tk.Button(frame1, text="즐겨찾기 삭제", command=bookmark_delete)
+    bookmark_del_button.grid(column=1, row=5, sticky="w")
 
-    # 정보창 캔버스
-    info_canvas = tk.Canvas(frame2, width=350, height=405, background='white')
+    # Notebook2 생성
+    notebook2 = ttk.Notebook(frame2)
+    notebook2.grid(column=0, row=0)
+
+    # 첫번째 탭에 정보창 캔버스 생성
+    n2_tab1 = ttk.Frame(notebook2)
+    info_canvas = tk.Canvas(n2_tab1, width=350, height=405, background='white')
     info_canvas.grid(column=0, row=1, columnspan=2)
+    notebook2.add(n2_tab1, text='정보')
+
+    n2_tab2 = ttk.Frame(notebook2)
+    notebook2.add(n2_tab2, text='지도')
 
     # 정보창 스크롤바
-    scrollbar2 = tk.Scrollbar(frame2, orient="vertical")
+    scrollbar2 = tk.Scrollbar(n2_tab1, orient="vertical")
     scrollbar2.grid(column=2, row=1, sticky="NS")
 
     # 스크롤바와 캔버스 연결
