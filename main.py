@@ -30,9 +30,14 @@ def mainGUI():
             info_canvas.create_image(0, 0, anchor="nw", image=photo)
             info_canvas.image = photo
 
-        info_canvas.create_text(175, 330, text=tour_infoes[index[0]]['title'], font=("Arial", 10), width=350)
-        info_canvas.create_text(175, 350, text="주소:"+tour_infoes[index[0]]['address'], font=("Arial", 10), width=350)
+        detail_infoes = Detail_Search(tour_infoes[index[0]]['contentid'])
+        overview_text = detail_infoes[0]['overview'].replace("<br>", "")
 
+        info_canvas.create_text(175, 300, text="["+tour_infoes[index[0]]['title']+"]", font=("Georgia", 14, "bold"), width=350)
+        info_canvas.create_text(175, 340, text=tour_infoes[index[0]]['address'], font=("Georgia", 13, "bold"), width=350)
+        info_canvas.create_text(0, 380, text=" "+overview_text, font=("Georgia", 12), width=350, anchor="nw")
+
+        info_canvas.configure(scrollregion=info_canvas.bbox("all"))
 
 
     # 시도 선택에 따른 시군구 업데이트
@@ -73,8 +78,6 @@ def mainGUI():
 
         tour_infoes = Area_Based(1, content_code, sido_code, sigungu_code)
 
-        tourism_title = [tourism['title'] for tourism in tour_infoes]
-
         # 캔버스 초기화
         info_canvas.delete('all')
 
@@ -82,6 +85,9 @@ def mainGUI():
             tourism_list.insert(tk.END, f"{tour_info['title']}")
 
         selected_tourism_info = tour_infoes
+
+    def canvas_mousewheel(event):
+        info_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
 
     window = tk.Tk()
@@ -149,14 +155,17 @@ def mainGUI():
     info_canvas = tk.Canvas(frame2, width=350, height=405, background='white')
     info_canvas.grid(column=0, row=1, columnspan=2)
 
+    # 정보창 스크롤바
     scrollbar2 = tk.Scrollbar(frame2, orient="vertical")
     scrollbar2.grid(column=2, row=1, sticky="NS")
 
+    # 스크롤바와 캔버스 연결
     info_canvas.config(yscrollcommand=scrollbar2.set)
     scrollbar2.config(command=info_canvas.yview)
 
     content_combo.bind("<<ComboboxSelected>>", show_tourism_list)
     tourism_list.bind("<<ListboxSelect>>", show_tourism_info)
+    info_canvas.bind("<MouseWheel>", canvas_mousewheel)
 
     window.mainloop()
 

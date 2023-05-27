@@ -27,17 +27,64 @@ def Area_Based(pageNo, ContentTypeId, Areacode, Sigungucode):
     tour_infoes = []
     for item in items:
         tour_info = {
+            "contentid": item.findtext("contentid"),
             "title": item.findtext("title"),
             "address": item.findtext("addr1"),
             "firstimage": item.findtext("firstimage"),
-            "firstimage2": item.findtext("firstimage2"),
             "lat": item.findtext("mapy"),
             "lng": item.findtext("mapx")
         }
         tour_infoes.append(tour_info)
 
+    # # api 잘 읽어오는지 test
+    # for data in tour_infoes:
+    #         print("Title:", data["title"])
+    #         print("ContentID:", data["contentid"])
+    #         print("Address:", data["address"])
+    #         print("Latitude:", data["lat"])
+    #         print("Longitude:", data["lng"])
+    #         print("-----")
+
     return tour_infoes
 
+def Detail_Search(contentid):
+
+    detail_search_url = "http://apis.data.go.kr/B551011/KorService1/detailCommon1"
+
+    params = {
+        "numOfRows": 100,
+        "pageNo": 1,
+        "MobileOS": "ETC",
+        "MobileApp": "Korea_tourism",
+        "contentId": contentid,
+        "defaultYN": "Y",
+        "overviewYN": "Y",
+        "serviceKey": api_key
+    }
+
+    response = requests.get(detail_search_url, params=params)
+    root = ET.fromstring(response.content)
+    items = root.findall(".//item")
+
+    detail_infoes = []
+    for item in items:
+        detail_info = {
+            "title": item.findtext("title"),
+            "tel": item.findtext("tel"),
+            "homepage": item.findtext("homepage"),
+            "overview": item.findtext("overview")
+        }
+        detail_infoes.append(detail_info)
+
+    # # api 잘 읽어오는지 test
+    # for data in detail_infoes:
+    #         print("Title:", data["title"])
+    #         print("tel:", data["tel"])
+    #         print("homepage:", data["homepage"])
+    #         print("overview:", data["overview"])
+    #         print("-----")
+
+    return detail_infoes
 
 def Area_Code():
 
@@ -91,7 +138,6 @@ def Sigungu_Code(area_code):
         sigungu_codes.append(sigungu_code)
 
     return sigungu_codes
-
 
 def Content_Type():
 
