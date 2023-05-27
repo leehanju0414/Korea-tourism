@@ -2,7 +2,7 @@ import requests
 import xml.etree.ElementTree as ET
 
 # 공공데이터 API 키 (Decoding)
-api_key = "6yz0bWs7lsT7OEp3s2Zb1/+jx7qOFqNT18qCdMYOLc9PhxYdxrJ+Y78g0dPjztos2oMgCvbNDwjtL65zRi4/OQ=="
+api_key = ""
 
 
 def Area_Based(pageNo, ContentTypeId, Areacode, Sigungucode):
@@ -97,8 +97,8 @@ def Sigungu_Code(area_code):
 
 def Content_Type():
 
-    content_types = []
+    content_types = [{'name': '관광지', 'code': '12'}, {'name': '문화시설', 'code': '14'}, {'name': '축제공연행사', 'code': '15'},
+                     {'name': '여행코스', 'code': '25'}, {'name': '레포츠', 'code': '28'}, {'name': '숙박', 'code': '32'},
+                     {'name': '쇼핑', 'code': '38'}, {'name': '음식점', 'code': '39'}, {'name': '전체', 'code': None}]
 
-
-
-
+    return content_types
