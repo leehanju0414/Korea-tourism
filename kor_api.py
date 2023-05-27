@@ -29,18 +29,15 @@ def Area_Based(pageNo, ContentTypeId, Areacode, Sigungucode):
         tour_info = {
             "title": item.findtext("title"),
             "address": item.findtext("addr1"),
+            "firstimage": item.findtext("firstimage"),
+            "firstimage2": item.findtext("firstimage2"),
             "lat": item.findtext("mapy"),
             "lng": item.findtext("mapx")
         }
         tour_infoes.append(tour_info)
 
-    # api 잘 읽어오는지 test
-    for data in tour_infoes:
-            print("Title:", data["title"])
-            print("Address:", data["address"])
-            print("Latitude:", data["lat"])
-            print("Longitude:", data["lng"])
-            print("-----")
+    return tour_infoes
+
 
 def Area_Code():
 
@@ -95,10 +92,11 @@ def Sigungu_Code(area_code):
 
     return sigungu_codes
 
+
 def Content_Type():
 
     content_types = [{'name': '관광지', 'code': '12'}, {'name': '문화시설', 'code': '14'}, {'name': '축제공연행사', 'code': '15'},
                      {'name': '여행코스', 'code': '25'}, {'name': '레포츠', 'code': '28'}, {'name': '숙박', 'code': '32'},
-                     {'name': '쇼핑', 'code': '38'}, {'name': '음식점', 'code': '39'}, {'name': '전체', 'code': None}]
+                     {'name': '쇼핑', 'code': '38'}, {'name': '음식점', 'code': '39'}, {'name': '전체', 'code': ''}]
 
     return content_types
