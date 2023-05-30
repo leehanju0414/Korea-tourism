@@ -36,14 +36,14 @@ def Area_Based(pageNo, ContentTypeId, Areacode, Sigungucode):
         }
         tour_infoes.append(tour_info)
 
-    # api 잘 읽어오는지 test
-    for data in tour_infoes:
-            print("Title:", data["title"])
-            print("ContentID:", data["contentid"])
-            print("Address:", data["address"])
-            print("Latitude:", data["lat"])
-            print("Longitude:", data["lng"])
-            print("-----")
+    # # api 잘 읽어오는지 test
+    # for data in tour_infoes:
+    #         print("Title:", data["title"])
+    #         print("ContentID:", data["contentid"])
+    #         print("Address:", data["address"])
+    #         print("Latitude:", data["lat"])
+    #         print("Longitude:", data["lng"])
+    #         print("-----")
 
     return tour_infoes
 

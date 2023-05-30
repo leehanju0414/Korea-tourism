@@ -6,6 +6,7 @@ from io import BytesIO
 from kor_api import *
 from map_api import *
 
+zoom = 13
 
 def mainGUI():
 
@@ -20,6 +21,7 @@ def mainGUI():
 
     def show_tourism_info(event):
         global selected_tourism_info
+        global zoom
 
         info_canvas.delete('all')
 
@@ -48,12 +50,33 @@ def mainGUI():
 
         info_canvas.configure(scrollregion=info_canvas.bbox("all"))
 
-        # 지도 이미지 생성
+        show_map()
+
+    def show_map():
+        global zoom
+        global selected_tourism_info
+
+        map_canvas.delete('all')
+
+        tour_infoes = selected_tourism_info
+        index = tourism_list.curselection()
+
         lat = tour_infoes[index[0]]['lat']
         lng = tour_infoes[index[0]]['lng']
-        map_photo = Map_Update(lat, lng)
+        map_photo = Map_Update(lat, lng, zoom)
         map_canvas.create_image(0, 0, anchor="nw", image=map_photo)
         map_canvas.image = map_photo
+
+    def zoom_in():
+        global zoom
+        zoom += 1
+        show_map()
+
+    def zoom_out():
+        global zoom
+        if zoom > 1:
+            zoom -= 1
+        show_map()
 
 
     # 시도 선택에 따른 시군구 업데이트
@@ -72,7 +95,7 @@ def mainGUI():
         sigungu_combo['values'] = list(sigungu_options)
         sigungu_combo.set("시/군/구")
 
-    def show_tourism_list(event):
+    def show_tourism_list():
         global selected_tourism_info
         tourism_list.delete(0, tk.END)
 
@@ -104,7 +127,6 @@ def mainGUI():
 
     def canvas_mousewheel(event):
         info_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
 
     window = tk.Tk()
 
@@ -144,6 +166,9 @@ def mainGUI():
     content_options = set([content["name"] for content in content_codes])
     content_combo = ttk.Combobox(frame1, textvariable=selected_content, values=list(content_options))
     content_combo.grid(column=0, row=3)
+
+    search_button = tk.Button(frame1, text=' 검색 ', command=show_tourism_list)
+    search_button.grid(column=1, row=3, sticky='w')
 
     sido_combo.bind("<<ComboboxSelected>>", update_sigungu_combo)
 
@@ -195,9 +220,15 @@ def mainGUI():
 
     # 두번째 탭에 지도 캔버스 생성
     n2_tab2 = ttk.Frame(notebook2)
-    map_canvas = tk.Canvas(n2_tab2, width=350, height=405, background='white')
+    map_canvas = tk.Canvas(n2_tab2, width=360, height=410)
     map_canvas.grid(column=0, row=1, columnspan=2)
     notebook2.add(n2_tab2, text='지도')
+
+    # 줌인 줌아웃 버튼 생성
+    zoom_in_button = tk.Button(n2_tab2, text="확대(+)", command=zoom_in)
+    zoom_in_button.grid(column=0, row=0, sticky='e')
+    zoom_out_button = tk.Button(n2_tab2, text="축소(-)", command=zoom_out)
+    zoom_out_button.grid(column=1, row=0, sticky='w')
 
     # 정보창 스크롤바
     scrollbar2 = tk.Scrollbar(n2_tab1, orient="vertical")
@@ -207,7 +238,6 @@ def mainGUI():
     info_canvas.config(yscrollcommand=scrollbar2.set)
     scrollbar2.config(command=info_canvas.yview)
 
-    content_combo.bind("<<ComboboxSelected>>", show_tourism_list)
     tourism_list.bind("<<ListboxSelect>>", show_tourism_info)
     info_canvas.bind("<MouseWheel>", canvas_mousewheel)
 
