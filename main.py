@@ -4,6 +4,7 @@ from PIL import ImageTk, Image
 import requests
 from io import BytesIO
 from kor_api import *
+from map_api import *
 
 
 def mainGUI():
@@ -46,6 +47,13 @@ def mainGUI():
         info_canvas.create_text(0, 400, text=" "+overview_text, font=("Georgia", 12), width=350, anchor="nw")
 
         info_canvas.configure(scrollregion=info_canvas.bbox("all"))
+
+        # 지도 이미지 생성
+        lat = tour_infoes[index[0]]['lat']
+        lng = tour_infoes[index[0]]['lng']
+        map_photo = Map_Update(lat, lng)
+        map_canvas.create_image(0, 0, anchor="nw", image=map_photo)
+        map_canvas.image = map_photo
 
 
     # 시도 선택에 따른 시군구 업데이트
@@ -185,7 +193,10 @@ def mainGUI():
     info_canvas.grid(column=0, row=1, columnspan=2)
     notebook2.add(n2_tab1, text='정보')
 
+    # 두번째 탭에 지도 캔버스 생성
     n2_tab2 = ttk.Frame(notebook2)
+    map_canvas = tk.Canvas(n2_tab2, width=350, height=405, background='white')
+    map_canvas.grid(column=0, row=1, columnspan=2)
     notebook2.add(n2_tab2, text='지도')
 
     # 정보창 스크롤바
