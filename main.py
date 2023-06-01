@@ -7,17 +7,49 @@ from kor_api import *
 from map_api import *
 
 zoom = 13
+selected_tourism_info = None
+selected_bookmark = None
+bookmarks = []
 
 def mainGUI():
 
-    selected_tourism_info = None
-    bookmarks = []
-
     def bookmark_append():
-        pass
+        global selected_tourism_info
+        global selected_bookmark
+        global bookmarks
+
+        bookmark_list.delete(0, tk.END)
+
+        tour_infoes = selected_tourism_info
+        index = tourism_list.curselection()
+        bookmarks.append(tour_infoes[index[0]])
+
+        for bookmark in bookmarks:
+            bookmark_list.insert(tk.END, f"{bookmark['title']}")
+
+        selected_bookmark = bookmarks
+
+
 
     def bookmark_delete():
-        pass
+        global selected_bookmark
+        global bookmarks
+
+        index = bookmark_list.curselection()
+
+        if index:
+            selected_indexes = list(index)
+            selected_indexes.sort(reverse=True)
+            for idx in selected_indexes:
+                bookmarks.pop(idx)
+
+        bookmark_list.delete(0, tk.END)
+
+        for bookmark in bookmarks:
+            bookmark_list.insert(tk.END, f"{bookmark['title']}")
+
+        selected_bookmark = bookmarks
+
 
     def show_tourism_info(event):
         global selected_tourism_info
