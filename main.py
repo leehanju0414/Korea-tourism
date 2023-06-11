@@ -10,8 +10,12 @@ zoom = 13
 selected_tourism_info = None
 selected_bookmark = None
 bookmarks = []
+select_map = selected_tourism_info
 
 def mainGUI():
+
+    def telegram():
+        pass
 
     def bookmark_append():
         global selected_tourism_info
@@ -82,16 +86,55 @@ def mainGUI():
 
         info_canvas.configure(scrollregion=info_canvas.bbox("all"))
 
-        show_map()
+        show_map(selected_tourism_info)
 
-    def show_map():
+    def bookmark_tourism_info(event):
+        global selected_bookmark
         global zoom
-        global selected_tourism_info
+
+        info_canvas.delete('all')
+
+        index = bookmark_list.curselection()
+        tour_infoes = selected_bookmark
+
+        if tour_infoes[index[0]]['firstimage']:
+            img_url = tour_infoes[index[0]]['firstimage']
+
+            response = requests.get(img_url)
+            image = Image.open(BytesIO(response.content))
+
+            image = image.resize((350, 261))
+            photo = ImageTk.PhotoImage(image)
+
+            info_canvas.create_image(0, 0, anchor="nw", image=photo)
+            info_canvas.image = photo
+
+        detail_infoes = Detail_Search(tour_infoes[index[0]]['contentid'])
+        overview_text = detail_infoes[0]['overview'].replace("<br>", "")
+
+        info_canvas.create_text(175, 300, text="["+tour_infoes[index[0]]['title']+"]", font=("Georgia", 14, "bold"), width=350)
+        info_canvas.create_text(175, 340, text=tour_infoes[index[0]]['address'], font=("Georgia", 13, "bold"), width=350)
+        info_canvas.create_text(175, 360, text=detail_infoes[0]['tel'], font=("Georgia", 13, "bold"), width=350)
+        info_canvas.create_text(0, 400, text=" "+overview_text, font=("Georgia", 12), width=350, anchor="nw")
+
+        info_canvas.configure(scrollregion=info_canvas.bbox("all"))
+
+        show_map(selected_bookmark)
+
+    def show_map(select):
+        global zoom
+        global select_map
+
+        select_map = select
 
         map_canvas.delete('all')
 
-        tour_infoes = selected_tourism_info
-        index = tourism_list.curselection()
+        tour_infoes = select
+
+        if select == selected_tourism_info:
+            index = tourism_list.curselection()
+        elif select == selected_bookmark:
+            index = bookmark_list.curselection()
 
         lat = tour_infoes[index[0]]['lat']
         lng = tour_infoes[index[0]]['lng']
@@ -101,14 +144,18 @@ def mainGUI():
 
     def zoom_in():
         global zoom
+        global select_map
+
         zoom += 1
-        show_map()
+        show_map(select_map)
 
     def zoom_out():
         global zoom
+        global select_map
+
         if zoom > 1:
             zoom -= 1
-        show_map()
+        show_map(select_map)
 
 
     # 시도 선택에 따른 시군구 업데이트
@@ -240,6 +287,10 @@ def mainGUI():
     bookmark_del_button = tk.Button(frame1, text="즐겨찾기 삭제", command=bookmark_delete)
     bookmark_del_button.grid(column=1, row=5, sticky="w")
 
+    # 텔레그렘 전송 버튼 생성
+    telegram_button = tk.Button(frame1, text="텔레그램", command=telegram)
+    telegram_button.grid(column=1, row=5, sticky="e")
+
     # Notebook2 생성
     notebook2 = ttk.Notebook(frame2)
     notebook2.grid(column=0, row=0)
@@ -271,6 +322,7 @@ def mainGUI():
     scrollbar2.config(command=info_canvas.yview)
 
     tourism_list.bind("<<ListboxSelect>>", show_tourism_info)
+    bookmark_list.bind("<<ListboxSelect>>", bookmark_tourism_info)
     info_canvas.bind("<MouseWheel>", canvas_mousewheel)
 
     window.mainloop()
