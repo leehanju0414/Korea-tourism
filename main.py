@@ -5,6 +5,8 @@ import requests
 from io import BytesIO
 from kor_api import *
 from map_api import *
+from telegram import Bot
+import asyncio
 
 zoom = 13
 selected_tourism_info = None
@@ -14,8 +16,24 @@ select_map = selected_tourism_info
 
 def mainGUI():
 
-    def telegram():
-        pass
+    async def telegram():
+        global selected_bookmark
+        TOKEN = ''
+
+        bot = Bot(token=TOKEN)
+        chat_id = ''
+
+        for bookmark in selected_bookmark:
+            message = f"{bookmark['title']}"+"\n"+f"{bookmark['address']}"
+            photo = bookmark['firstimage']
+            await bot.send_photo(chat_id=chat_id, photo=photo)
+            await bot.send_message(chat_id=chat_id, text=message)
+
+    def button_clicked():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(telegram())
+        loop.close()
 
     def bookmark_append():
         global selected_tourism_info
@@ -288,7 +306,7 @@ def mainGUI():
     bookmark_del_button.grid(column=1, row=5, sticky="w")
 
     # 텔레그렘 전송 버튼 생성
-    telegram_button = tk.Button(frame1, text="텔레그램", command=telegram)
+    telegram_button = tk.Button(frame1, text="텔레그램", command=button_clicked)
     telegram_button.grid(column=1, row=5, sticky="e")
 
     # Notebook2 생성
