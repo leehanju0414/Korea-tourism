@@ -7,6 +7,7 @@ from kor_api import *
 from map_api import *
 from telegram import Bot
 import asyncio
+import spam
 
 zoom = 13
 selected_tourism_info = None
@@ -16,6 +17,47 @@ select_map = selected_tourism_info
 
 def mainGUI():
 
+    def graph_draw(sido_code, sigungu_code):
+        code12, code14, code15, code28, code32, code38, code39 = 0, 0, 0, 0, 0, 0, 0
+        tour_infoes = Area_Based(1,'',sido_code,sigungu_code)
+
+        graph_canvas.delete('all')
+
+        for tour_info in tour_infoes:
+            if tour_info['contenttypeid'] == '12':
+                code12 += 1
+            elif tour_info['contenttypeid'] == '14':
+                code14 += 1
+            elif tour_info['contenttypeid'] == '15':
+                code15 += 1
+            elif tour_info['contenttypeid'] == '28':
+                code28 += 1
+            elif tour_info['contenttypeid'] == '32':
+                code32 += 1
+            elif tour_info['contenttypeid'] == '38':
+                code38 += 1
+            elif tour_info['contenttypeid'] == '39':
+                code39 += 1
+
+        content_names = ['관광지', '문화시설', '축제공연행사', '레포츠', '숙박', '쇼핑', '음식점']
+        content_counts = [code12, code14, code15, code28, code32, code38, code39]
+
+        count_sum = spam.spam_plus(content_counts)
+
+        max_content_count = max(content_counts)
+        bar_width = 20
+        x_gap = 30
+        x0 = 20
+        y0 = 250
+        for i in range(7):
+            x1 = x0 + i * (bar_width + x_gap)
+            y1 = y0 - 200 * content_counts[i] / max_content_count
+            graph_canvas.create_rectangle(x1, y1, x1 + bar_width, y0, fill='blue')
+            graph_canvas.create_text(x1 + bar_width / 2, y0 + 100, text=content_names[i], anchor='n', angle=90)
+            graph_canvas.create_text(x1 + bar_width / 2, y1 - 10, text=content_counts[i], anchor='s')
+
+        graph_canvas.create_text(5, 390, text="합계= "+str(count_sum)+"개", anchor='nw')
+
     async def telegram():
         global selected_bookmark
         TOKEN = ''
@@ -24,12 +66,12 @@ def mainGUI():
         chat_id = ''
 
         for bookmark in selected_bookmark:
-            message = f"{bookmark['title']}"+"\n"+f"{bookmark['address']}"
+            message = f"{bookmark['title']}\n"+f"{bookmark['address']}"
             photo = bookmark['firstimage']
             await bot.send_photo(chat_id=chat_id, photo=photo)
             await bot.send_message(chat_id=chat_id, text=message)
 
-    def button_clicked():
+    def telegram_clicked():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(telegram())
@@ -214,6 +256,8 @@ def mainGUI():
 
         tour_infoes = Area_Based(1, content_code, sido_code, sigungu_code)
 
+        graph_draw(sido_code, sigungu_code)
+
         # 캔버스 초기화
         info_canvas.delete('all')
 
@@ -306,7 +350,7 @@ def mainGUI():
     bookmark_del_button.grid(column=1, row=5, sticky="w")
 
     # 텔레그렘 전송 버튼 생성
-    telegram_button = tk.Button(frame1, text="텔레그램", command=button_clicked)
+    telegram_button = tk.Button(frame1, text="텔레그램", command=telegram_clicked)
     telegram_button.grid(column=1, row=5, sticky="e")
 
     # Notebook2 생성
@@ -330,6 +374,12 @@ def mainGUI():
     zoom_in_button.grid(column=0, row=0, sticky='e')
     zoom_out_button = tk.Button(n2_tab2, text="축소(-)", command=zoom_out)
     zoom_out_button.grid(column=1, row=0, sticky='w')
+
+    # 세번째 탭에 그래프 캔버스 생성
+    n2_tab3 = ttk.Frame(notebook2)
+    graph_canvas = tk.Canvas(n2_tab3, width=360, height=410, background='white')
+    graph_canvas.grid(column=0, row=1, columnspan=2)
+    notebook2.add(n2_tab3, text='그래프')
 
     # 정보창 스크롤바
     scrollbar2 = tk.Scrollbar(n2_tab1, orient="vertical")

@@ -10,7 +10,7 @@ def Area_Based(pageNo, ContentTypeId, Areacode, Sigungucode):
     area_Based_url = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1"
 
     params = {
-        "numOfRows": 100,
+        "numOfRows": 10000,
         "pageNo": pageNo,
         "MobileOS": "ETC",
         "MobileApp": "Korea_tourism",
@@ -31,6 +31,7 @@ def Area_Based(pageNo, ContentTypeId, Areacode, Sigungucode):
             "title": item.findtext("title"),
             "address": item.findtext("addr1"),
             "firstimage": item.findtext("firstimage"),
+            "contenttypeid": item.findtext("contenttypeid"),
             "lat": item.findtext("mapy"),
             "lng": item.findtext("mapx")
         }
@@ -142,7 +143,7 @@ def Sigungu_Code(area_code):
 def Content_Type():
 
     content_types = [{'name': '관광지', 'code': '12'}, {'name': '문화시설', 'code': '14'}, {'name': '축제공연행사', 'code': '15'},
-                     {'name': '여행코스', 'code': '25'}, {'name': '레포츠', 'code': '28'}, {'name': '숙박', 'code': '32'},
+                     {'name': '레포츠', 'code': '28'}, {'name': '숙박', 'code': '32'},
                      {'name': '쇼핑', 'code': '38'}, {'name': '음식점', 'code': '39'}, {'name': '전체', 'code': ''}]
 
     return content_types
