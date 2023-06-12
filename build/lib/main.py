@@ -115,10 +115,10 @@ def mainGUI():
 
     async def telegram():
         global selected_bookmark
-        TOKEN = ''
+        TOKEN = '6187417159:AAEoGlZFKzb1l_6ydyoSPRq4zuPSOyxxbrA'
 
         bot = Bot(token=TOKEN)
-        chat_id = ''
+        chat_id = '6048145248'
 
         for bookmark in selected_bookmark:
             message = f"{bookmark['title']}\n"+f"{bookmark['address']}"
